@@ -2,13 +2,13 @@ package push_box;
 
 /**
  * push all boxes to target
+ * 1. find all operations can perform through DFS ( an operation is a push )
+ * 2. perform each operation as a BFS, record it with a process ( a process describes the map and the operation
+ * at the certain time )
+ * 3. find a list of process to show the solution
  */
 public class PushBox {
-    enum PushProcessStatus {
-        FINISHED, // all boxes at target
-        DEAD,     // all boxes not moveable but not finished
-        RUNNING   // some box moveable
-    }
+
 
     int[][] origMap = {
             {1, 1, 1, 1, 1, 1, 1}, // 1 = wall
@@ -30,15 +30,8 @@ public class PushBox {
 //            {1, 1, 1, 1, 1, 1, 1}
 //    };
 
-    public static int maxWidth = 5;
+    int maxWidth = 5;
+    int maxHeight = 5;
+    int heroX = 3, heroY = 3; // hero position
 
-    public static int maxHeight = 5;
-
-    public static void main(String[] args) {
-        PushBox pushBox = new PushBox();
-        PushProcess process = new PushProcess(pushBox.origMap);
-        PushProcessStatus status = process.getStatus();
-        System.out.println(status.name());
-        process.draw("test");
-    }
 }
