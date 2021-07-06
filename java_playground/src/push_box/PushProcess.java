@@ -15,7 +15,7 @@ class PushProcess {
     int heroX, heroY;
     int[][] targets;
 
-    public enum Direction{
+    public enum Direction {
         UP(-1, 0), DOWN(1, 0), LEFT(0, -1), RIGHT(0, 1);
 
         public final int x, y;
@@ -64,12 +64,20 @@ class PushProcess {
         setMap(map);
     }
 
-    public void setMap(int[][] newMap) {
-        this.map = new int[newMap.length][newMap[0].length];
+    private int[][] mapCopy(int[][] map) {
+        int[][]copy = new int[map.length][map[0].length];
         for (int i = 0; i < map.length; i++) {
-            System.arraycopy(newMap[i], 0, this.map[i], 0, newMap[0].length);
+            for (int j = 0; j < map[0].length; j++) {
+                copy[i][j] = Math.max(map[i][j], 0); // reset -1 (reached) to 0 (unreached)
+            }
         }
+        return copy;
     }
+
+    public void setMap(int[][] newMap) {
+        map = mapCopy(newMap);
+    }
+
     private boolean isTarget(int x, int y) {
         for (int[] target : targets) {
             if (target[0] == x && target[1] == y) {
@@ -82,6 +90,10 @@ class PushProcess {
     private boolean moveAble(int x, int y) {
         // 0 is empty and -1 is marked as arrived before.
         return (map[x - 1][y] <= 0 && map[x + 1][y] <= 0) || (map[x][y - 1] <= 0 && map[x][y + 1] <= 0);
+    }
+
+    private boolean moveAble(int x, int y, Direction d) {
+        return map[x + d.x][y + d.y] <= 0;
     }
 
     public Status getStatus() {
@@ -113,16 +125,16 @@ class PushProcess {
     private void dfsOperations(List<Operation> operations) {
         map[heroX][heroY] = -1;
         for (Direction direction : Direction.values()) {
-            int x = direction.x + heroX;
-            int y = direction.y + heroY;
-            if (map[x][y] == 0) { // a road that not reached ever, go there
-                heroX = x;
-                heroY = y;
+            int nextX = direction.x + heroX;
+            int nextY = direction.y + heroY;
+            if (map[nextX][nextY] == 0) { // a road that not reached ever, go there
+                heroX = nextX;
+                heroY = nextY;
                 dfsOperations(operations);
-                heroX = x-direction.x;
-                heroY = y-direction.y;
-            } else if (map[x][y] == 2 && moveAble(x, y)) { // a moveable box found means a new operation
-                operations.add(new Operation(x, y, direction));
+                heroX = nextX - direction.x;
+                heroY = nextY - direction.y;
+            } else if (map[nextX][nextY] == 2 && moveAble(nextX, nextY, direction)) { // a moveable box found means a new operation
+                operations.add(new Operation(nextX, nextY, direction));
             }
         }
     }
@@ -131,6 +143,13 @@ class PushProcess {
         ArrayList<Operation> operations = new ArrayList<>();
         dfsOperations(operations);
         return operations;
+    }
+
+    public PushProcess performOperation(Operation op) {
+        int[][] newMap = mapCopy(map);
+        newMap[op.boxX][op.boxY] = 0;
+        newMap[op.boxX + op.direction.x][op.boxY + op.direction.y] = 2;
+        return new PushProcess(newMap, maxHeight, maxWidth, op.boxX, op.boxY, targets);
     }
 
     public void draw(String cmt) {

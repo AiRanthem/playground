@@ -55,8 +55,31 @@ class PushProcessTest {
         for (PushProcess.Operation operation : operations) {
             System.out.printf("%d, %d, %s\n", operation.getX(), operation.getY(), operation.getDirection());
         }
+        Assertions.assertEquals(4, operations.size());
+        System.out.println();
         process.setMap(deadMap);
         operations = process.searchAllOperations();
+        Assertions.assertEquals(0, operations.size());
+        process.setMap(finishedMap);
+        operations = process.searchAllOperations();
+        for (PushProcess.Operation operation : operations) {
+            System.out.printf("%d, %d, %s\n", operation.getX(), operation.getY(), operation.getDirection());
+        }
+        Assertions.assertEquals(8, operations.size());
+    }
+
+    @Test
+    void testPerformOperation() {
+        PushProcess oldProcess = new PushProcess(bh3Map, bh3MaxHeight, bh3MaxWidth, bh3HeroX, bh3HeroY, bh3Targets);
+        Assertions.assertEquals(2, oldProcess.map[2][3]);
+        PushProcess process = oldProcess.performOperation(new PushProcess.Operation(2, 3, PushProcess.Direction.UP));
+        process.draw("test");
+        Assertions.assertEquals(2, process.map[1][3]);
+        Assertions.assertEquals(0, process.map[2][3]);
+        Assertions.assertEquals(2, process.heroX);
+        Assertions.assertEquals(3, process.heroY);
+        List<PushProcess.Operation> operations = process.searchAllOperations();
+        Assertions.assertEquals(5, operations.size());
         for (PushProcess.Operation operation : operations) {
             System.out.printf("%d, %d, %s\n", operation.getX(), operation.getY(), operation.getDirection());
         }
