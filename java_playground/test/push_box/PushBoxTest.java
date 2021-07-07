@@ -11,7 +11,7 @@ public class PushBoxTest {
         pushBox.go();
         List<PushProcess> processes = pushBox.getProcesses();
         for (PushProcess process : processes) {
-            process.draw("test");
+            process.draw();
         }
         return pushBox;
     }

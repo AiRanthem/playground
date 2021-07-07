@@ -1,5 +1,7 @@
 package push_box;
 
+import org.w3c.dom.ls.LSOutput;
+
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
@@ -15,6 +17,7 @@ class PushProcess {
     int maxHeight, maxWidth;
     int heroX, heroY;
     int[][] targets;
+    Operation lastOp;
 
     @Override
     public boolean equals(Object o) {
@@ -70,12 +73,13 @@ class PushProcess {
         }
     }
 
-    public PushProcess(int[][] map, int maxHeight, int maxWidth, int heroX, int heroY, int[][] targets) {
+    public PushProcess(int[][] map, int maxHeight, int maxWidth, int heroX, int heroY, int[][] targets, Operation lastOp) {
         this.heroX = heroX;
         this.heroY = heroY;
         this.maxHeight = maxHeight;
         this.maxWidth = maxWidth;
         this.targets = targets;
+        this.lastOp = lastOp;
         setMap(map);
     }
 
@@ -130,6 +134,8 @@ class PushProcess {
 
         if (allAtTarget) {
             return Status.FINISHED;
+        } else if (allNotMoveable) {
+            return Status.DEAD;
         } else {
             return Status.ALIVE;
         }
@@ -162,12 +168,16 @@ class PushProcess {
         int[][] newMap = mapCopy(map);
         newMap[op.boxX][op.boxY] = 0;
         newMap[op.boxX + op.direction.x][op.boxY + op.direction.y] = 2;
-        return new PushProcess(newMap, maxHeight, maxWidth, op.boxX, op.boxY, targets);
+        return new PushProcess(newMap, maxHeight, maxWidth, op.boxX, op.boxY, targets, op);
     }
 
-    public void draw(String cmt) {
-        System.out.printf("%s:\n", cmt);
-        for (int i = 0; i <= maxHeight; i++) {
+    public void draw() {
+        if (lastOp != null) {
+            System.out.printf("Box at ( %d, %d ) move %s:\n", lastOp.getX(), lastOp.getY(), lastOp.getDirection());
+        } else {
+            System.out.println("Game START!");
+        }
+        for (int i = 0; i <= maxWidth; i++) {
             System.out.printf("%d ", i);
         }
         System.out.println();
@@ -193,6 +203,6 @@ class PushProcess {
                 default -> System.out.println();
             }
         }
+        System.out.println();
     }
-
 }

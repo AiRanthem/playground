@@ -58,7 +58,7 @@ public class PushBox {
     }
 
     public void go() {
-        boolean found = dfs(new PushProcess(origMap, maxHeight, maxWidth, heroX, heroY, targets));
+        boolean found = dfs(new PushProcess(origMap, maxHeight, maxWidth, heroX, heroY, targets, null));
         System.out.println(found);
     }
 
