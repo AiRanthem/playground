@@ -1,6 +1,7 @@
 package push_box;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 
 /**
@@ -14,6 +15,20 @@ class PushProcess {
     int maxHeight, maxWidth;
     int heroX, heroY;
     int[][] targets;
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+        PushProcess that = (PushProcess) o;
+        // use mapCopy to reset -1 to 0. this way maybe make more GC but look pretty maybe?
+        return Arrays.deepEquals(mapCopy(map), mapCopy(that.map));
+    }
+
+    @Override
+    public int hashCode() {
+        return Arrays.deepHashCode(mapCopy(map));
+    }
 
     public enum Direction {
         UP(-1, 0), DOWN(1, 0), LEFT(0, -1), RIGHT(0, 1);
@@ -115,8 +130,6 @@ class PushProcess {
 
         if (allAtTarget) {
             return Status.FINISHED;
-        } else if (allNotMoveable) {
-            return Status.DEAD;
         } else {
             return Status.ALIVE;
         }

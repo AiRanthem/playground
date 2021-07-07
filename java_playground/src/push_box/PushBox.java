@@ -1,9 +1,10 @@
 package push_box;
 
 import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 import java.util.Stack;
-import java.util.stream.Collectors;
 
 /**
  * push all boxes to target
@@ -20,6 +21,7 @@ public class PushBox {
     int heroX, heroY;
     int maxProcess;
     Stack<PushProcess> processes;
+    Set<PushProcess> visited;
 
     public PushBox(int[][] origMap, int[][] targets, int heroX, int heroY, int maxProcess) {
         this.origMap = origMap;
@@ -30,13 +32,15 @@ public class PushBox {
         this.maxHeight = origMap.length - 2;
         this.maxWidth = origMap[0].length - 2;
         this.processes = new Stack<>();
+        this.visited = new HashSet<>(maxProcess);
     }
 
     private boolean dfs(PushProcess process) { // true = found, false = not found
-        if (processes.size() >= maxProcess) {
+        if (processes.size() >= maxProcess || visited.contains(process)) {
             return false;
         }
         processes.push(process);
+        visited.add(process);
         if (process.getStatus() == PushProcess.Status.FINISHED) {
             return true;
         }
@@ -60,36 +64,5 @@ public class PushBox {
 
     public List<PushProcess> getProcesses() {
         return new ArrayList<>(processes);
-    }
-
-    public static void main(String[] args) {
-        int[][] bh3Map = {
-                {1, 1, 1, 1, 1, 1, 1}, // 1 = wall
-                {1, 0, 0, 0, 0, 0, 1}, // 0 = empty
-                {1, 0, 2, 2, 2, 0, 1}, // 2 = box
-                {1, 0, 2, 0, 2, 0, 1},
-                {1, 0, 2, 2, 2, 0, 1},
-                {1, 0, 0, 0, 0, 0, 1},
-                {1, 1, 1, 1, 1, 1, 1}
-        };
-        int bh3MaxHeight = 5, bh3MaxWidth = 5, bh3HeroX = 3, bh3HeroY = 3;
-        int[][] bh3Targets = new int[][] {
-                {1, 1}, {1, 3}, {1, 5},
-                {3, 1}, {3, 5},
-                {5, 1}, {5, 3}, {5, 5}
-        };
-
-        int[][] simpleMap = {
-                {1, 1, 1, 1, 1},
-                {1, 0, 2, 0, 1},
-                {1, 1, 1, 1, 1}
-        };
-
-        PushBox pushBox = new PushBox(bh3Map, bh3Targets, bh3HeroX, bh3HeroY, 100);
-        pushBox.go();
-        List<PushProcess> processes = pushBox.getProcesses();
-        for (PushProcess process : processes) {
-            process.draw("test");
-        }
     }
 }

@@ -6,6 +6,7 @@ import org.junit.jupiter.api.Test;
 
 import java.io.ByteArrayOutputStream;
 import java.io.PrintStream;
+import java.util.HashSet;
 import java.util.List;
 
 class PushProcessTest {
@@ -24,8 +25,8 @@ class PushProcessTest {
             {1, 1, 1, 1, 1, 1, 1}, // 1 = wall
             {1, 2, 2, 0, 0, 2, 1}, // 0 = empty
             {1, 0, 0, 0, 0, 0, 1}, // 2 = box
-            {1, 0, 0, 0, 0, 0, 1},
-            {1, 2, 0, 0, 0, 2, 1},
+            {1, 0, 0, 0, 0, 2, 1},
+            {1, 2, 0, 0, 0, 0, 1},
             {1, 2, 0, 0, 2, 2, 1},
             {1, 1, 1, 1, 1, 1, 1}
     };
@@ -114,5 +115,16 @@ class PushProcessTest {
         Assertions.assertEquals(PushProcess.Status.DEAD, process.getStatus());
         process.setMap(finishedMap);
         Assertions.assertEquals(PushProcess.Status.FINISHED, process.getStatus());
+    }
+
+    @Test
+    void testHash() {
+        PushProcess process1 = new PushProcess(bh3Map, bh3MaxHeight, bh3MaxWidth, bh3HeroX, bh3HeroY, bh3Targets);
+        PushProcess process2 = new PushProcess(bh3Map, bh3MaxHeight, bh3MaxWidth, bh3HeroX, bh3HeroY, bh3Targets);
+        HashSet<PushProcess> set = new HashSet<>();
+        set.add(process1);
+        set.add(process2);
+        Assertions.assertEquals(process1, process2);
+        Assertions.assertEquals(1, set.size());
     }
 }
